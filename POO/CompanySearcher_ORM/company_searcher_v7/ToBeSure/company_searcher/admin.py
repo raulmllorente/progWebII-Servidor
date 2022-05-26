@@ -1,0 +1,46 @@
+from flask_login import current_user
+from wtforms import PasswordField
+from werkzeug.security import generate_password_hash
+from flask_admin import Admin, AdminIndexView
+from flask_admin.contrib.sqla import ModelView
+from app import app
+from models import db, User, Balancesheet
+
+class AdminView(AdminIndexView):
+  def is_accessible(self):
+    if current_user.is_authenticated and current_user.type_user == 1:
+      return True
+    return False
+
+
+admin = Admin(index_view=AdminView())
+admin.init_app(app)
+
+class ProtectedView(ModelView):
+  def is_accessible(self):
+    if current_user.is_authenticated and current_user.type_user == 1:
+      return True
+    return False
+
+class UserAdmin(ProtectedView):
+
+  column_exclude_list = ('password')
+  form_excluded_columns = ('password')
+  column_auto_select_related = True
+
+  def scaffold_form(self):
+    form_class = super(UserAdmin, self).scaffold_form()
+    form_class.password2 = PasswordField('New Password')
+    return form_class
+  def on_model_change(self, form, model, is_created):
+    if len(model.password2):
+      model.password = generate_password_hash(model.password2,method='sha256')
+  def is_accessible(self):
+    return current_user.is_authenticated and current_user.type_user == 1
+
+admin.add_view(UserAdmin(User, db.session))
+admin.add_view(ProtectedView(Balancesheet, db.session))
+
+from flask_admin.menu import MenuLink
+admin.add_link(MenuLink(name='Logout',category="", url='/logout'))
+admin.add_link(MenuLink(name='Go back',category="", url='/'))

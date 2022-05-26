@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+{% if form %}
+    {% import "bootstrap/wtf.html" as wtf %}
+{% endif %}
+
+{% block title %} CS {% endblock %}
+
+
+{% block content %}
+
+
+
+
+    <br>
+   {% if form %}
+   <form class="form-signin" method="POST" action="{{url_for('module002.module002_index')}}">
+        Type the name of the company you want to see data:
+        {{ form.hidden_tag() }}
+        {{form.company_name(list="id_datalist")}}
+        <datalist id="id_datalist">
+            {% for entry in entries %}
+                <option value={{ entry }}>
+            {% endfor %}
+        </datalist>
+
+         <button class="btn btn-lg btn-primary btn-block" type="submit"> Search </button>
+     </form>
+    {% endif %}
+
+
+    <br>
+	{% if result %}
+
+          <div class="table-responsive">
+            <table id="myTable" class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Index</th>
+                  <th>Nif (to Json)</th>
+                  <th>Name</th>
+                  <th>CNAE</th>
+                  <th>TotalAssets_h0</th>
+                  <th>TotalAssets_h1</th>
+                  <th>TotalAssets_h2</th>
+                  <th>OwnCapital_h0</th>
+                  <th>OwnCapital_h1</th>
+                  <th>OwnCapital_h2</th>
+                  <th>ShortTermDebt_h0</th>
+                  <th>ShortTermDebt_h1</th>
+                  <th>ShortTermDebt_h2</th>
+                  <th>LongTermDebt_h0</th>
+                  <th>LongTermDebt_h1</th>
+                  <th>LongTermDebt_h2</th>
+                  <th>SalesTurnover_h0</th>
+                  <th>SalesTurnover_h1</th>
+                  <th>SalesTurnover_h2</th>
+                  <th>Amortization_h0</th>
+                  <th>Amortization_h1</th>
+                  <th>Amortization_h2</th>
+                  <th>Profit_h0</th>
+                  <th>Profit_h1</th>
+                  <th>Profit_h2</th>
+                  <th>status</th>
+
+                </tr>
+              </thead>
+              <tbody>
+                {% for row in rows %}
+                <tr>
+
+                    <td>{{ row.id }}</td>
+                       <td> <a><form action="{{url_for('module002.to_json')}}" method="GET">
+                           <input type="submit" value={{ row.nif_fical_number_id}} name="nif">
+                           <input type="hidden" value=YES name="json">
+                       </form> </a></td>
+
+                    <td>{{ row.nif_fical_number_id }}</td>
+                    <td>{{ row.company_name }}</td>
+                    <td>{{ row.CNAE }}</td>
+                    <td>{{ row.p10000_TotalAssets_h0 }}</td>
+                    <td>{{ row.p10000_TotalAssets_h1 }}</td>
+                    <td>{{ row.p10000_TotalAssets_h2 }}</td>
+                    <td>{{ row.p20000_OwnCapital_h0 }}</td>
+                    <td>{{ row.p20000_OwnCapital_h1 }}</td>
+                    <td>{{ row.p20000_OwnCapital_h2 }}</td>
+                    <td>{{ row.p31200_ShortTermDebt_h0 }}</td>
+                    <td>{{ row.p31200_ShortTermDebt_h1 }}</td>
+                    <td>{{ row.p31200_ShortTermDebt_h2 }}</td>
+                    <td>{{ row.p32300_LongTermDebt_h0 }}</td>
+                    <td>{{ row.p32300_LongTermDebt_h1 }}</td>
+                    <td>{{ row.p32300_LongTermDebt_h2 }}</td>
+                    <td>{{ row.p40100_40500_SalesTurnover_h0 }}</td>
+                    <td>{{ row.p40100_40500_SalesTurnover_h1 }}</td>
+                    <td>{{ row.p40100_40500_SalesTurnover_h2 }}</td>
+                    <td>{{ row.p40800_Amortization_h0 }}</td>
+                    <td>{{ row.p40800_Amortization_h1 }}</td>
+                    <td>{{ row.p40800_Amortization_h2 }}</td>
+                    <td>{{ row.p49100_Profit_h0 }}</td>
+                    <td>{{ row.p49100_Profit_h1 }}</td>
+                    <td>{{ row.p49100_Profit_h2 }}</td>
+                    <td>{{ row.detailed_status }}</td>
+
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+    {% endif %}
+
+  <script>
+$(document).ready(function() {
+    var table = $('#myTable').DataTable( {
+        lengthChange: false,
+        buttons: [ 'copy', 'excel', 'pdf', 'colvis' ]
+    } );
+
+    table.buttons().container()
+        .appendTo( '#example_wrapper .col-md-6:eq(0)' );
+} );
+  </script>
+{% endblock %}
